@@ -6,9 +6,8 @@ function love.load()
     ball.y = love.graphics.getHeight()/2
     ball.radius = 10
     ball.segments = 25
-    ball.xVel = 2
-    ball.yVel = 5
-    ball.moveSpeed = 10
+
+    ball.additionMoveSpeed = 0
 
     player = {}
     player.w = 100
@@ -22,7 +21,7 @@ function love.load()
     enemy.h = 20
     enemy.x = love.graphics.getWidth()/2 - enemy.w/2
     enemy.y = 10
-    enemy.moveSpeed = 10
+    enemy.moveSpeed = 6
     enemy.centerX = enemy.x + enemy.w/2
 
     score = {}
@@ -34,9 +33,31 @@ function love.load()
     font = love.graphics.newFont(14)
     love.graphics.setFont(font)
 
+    initGame()
+
 end
    
-   
+function initGame()
+  ball.x = love.graphics.getWidth()/2
+  ball.y = love.graphics.getHeight()/2
+  
+  ball.xVel = math.random(2,5)
+  ball.yVel = math.random(3,6)
+
+  if math.random(1,2) == 1 then
+    ball.xVel = -ball.xVel
+  end
+
+  if math.random(1,2) == 1 then
+    ball.yVel = -ball.yVel;
+  end
+
+  player.x = love.graphics.getWidth()/2 - player.w/2
+  enemy.x = love.graphics.getWidth()/2 - enemy.w/2
+
+end
+
+
 function love.update(dt)
 
   updatePlayer(dt)
@@ -78,12 +99,12 @@ end
 
 function updatePlayer(dt)
 
-  if love.keyboard.isDown("left") then
+  if love.keyboard.isDown("left") and player.x > 0 then
     player.x = player.x - player.moveSpeed
 
   end
 
-  if love.keyboard.isDown("right") then
+  if love.keyboard.isDown("right") and player.x < (love.graphics.getWidth()-player.w) then
     player.x = player.x + player.moveSpeed
 
   end
@@ -94,11 +115,11 @@ function updateEnemy(dt)
 
   enemy.centerX = enemy.x + (enemy.w/2)
 
-  if ball.x > enemy.centerX then
+  if ball.x > enemy.centerX and enemy.x < (love.graphics.getWidth()-enemy.w) then
     enemy.x = enemy.x + enemy.moveSpeed
   end 
 
-  if ball.x < enemy.centerX then
+  if ball.x < enemy.centerX and enemy.x > 0 then
     enemy.x = enemy.x - enemy.moveSpeed
   end 
 
@@ -114,15 +135,50 @@ end
 
 function updateBall(dt)
 
-  ball.y = ball.y + ball.yVel
-  ball.x = ball.x + ball.xVel
+  ball.y = ball.y + ball.yVel --+ ball.additionMoveSpeed
+  ball.x = ball.x + ball.xVel --+ ball.additionMoveSpeed
 
   if boxCircleCollision(player,ball) then
     ball.yVel = -ball.yVel;
+
+    --add to velocity
+    if ball.yVel > 0 then
+      ball.yVel = ball.yVel + 0.5
+    end
+
+    if ball.yVel < 0 then
+      ball.yVel = ball.yVel - 0.5
+    end
+
+    if ball.xVel > 0 then
+      ball.xVel = ball.xVel + 0.5
+    end
+
+    if ball.xVel < 0 then
+      ball.xVel = ball.xVel - 0.5
+    end
+
   end
 
   if boxCircleCollision(enemy,ball) then
     ball.yVel = -ball.yVel;
+
+    --add to velocity
+    if ball.yVel > 0 then
+      ball.yVel = ball.yVel + 0.5
+    end
+
+    if ball.yVel < 0 then
+      ball.yVel = ball.yVel - 0.5
+    end
+
+    if ball.xVel > 0 then
+      ball.xVel = ball.xVel + 0.5
+    end
+
+    if ball.xVel < 0 then
+      ball.xVel = ball.xVel - 0.5
+    end
   end
 
   if (ball.x + ball.radius) > love.graphics.getWidth() then
@@ -137,15 +193,13 @@ function updateBall(dt)
   if ball.y < 0 then
     score.playerScore = score.playerScore+1
 
-    ball.x = love.graphics.getWidth()/2
-    ball.y = love.graphics.getHeight()/2
+    initGame()
   end
 
   if ball.y > love.graphics.getHeight() then
     score.enemyScore = score.enemyScore+1
 
-    ball.x = love.graphics.getWidth()/2
-    ball.y = love.graphics.getHeight()/2
+    initGame()
   end
 
 
