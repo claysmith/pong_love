@@ -33,6 +33,9 @@ function love.load()
     font = love.graphics.newFont(14)
     love.graphics.setFont(font)
 
+    bounceSnd = love.audio.newSource("bounce.mp3","static")
+
+
     initGame()
 
 end
@@ -40,7 +43,7 @@ end
 function initGame()
   ball.x = love.graphics.getWidth()/2
   ball.y = love.graphics.getHeight()/2
-  
+
   ball.xVel = math.random(2,5)
   ball.yVel = math.random(3,6)
 
@@ -139,6 +142,9 @@ function updateBall(dt)
   ball.x = ball.x + ball.xVel --+ ball.additionMoveSpeed
 
   if boxCircleCollision(player,ball) then
+    bounceSnd:stop()
+    bounceSnd:play()
+
     ball.yVel = -ball.yVel;
 
     --add to velocity
@@ -161,6 +167,9 @@ function updateBall(dt)
   end
 
   if boxCircleCollision(enemy,ball) then
+    bounceSnd:stop()
+    bounceSnd:play()
+
     ball.yVel = -ball.yVel;
 
     --add to velocity
@@ -182,10 +191,16 @@ function updateBall(dt)
   end
 
   if (ball.x + ball.radius) > love.graphics.getWidth() then
+    bounceSnd:stop()
+    bounceSnd:play()
+
     ball.xVel = -ball.xVel
   end
 
   if ball.x < 0 then
+    bounceSnd:stop()
+    bounceSnd:play()
+    
     ball.xVel = -ball.xVel
   end
 
